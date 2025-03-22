@@ -37,6 +37,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
         PanelRC.SetActive(false);
         PanelRI.SetActive(false);
         PanelDif.SetActive(false);
@@ -89,16 +90,21 @@ public class GameController : MonoBehaviour
     }
     public void mostrarPreguntasMultiples()
     {
+        
+        int tipo = UnityEngine.Random.Range(1,2);
+
         if (dificiles == false)
         {
-            int tipo = UnityEngine.Random.Range(1, 2);
+           
             
             if (tipo == 1 && PMvacio != true)
             {
+                Debug.Log("Tipo de pregunta:"+ tipo);
                 PanelPA.SetActive(false);
                 if (listaPMF.Count != 8)
                 {
                     int i = UnityEngine.Random.Range(0, listaPMF.Count);
+                    Debug.Log("Indice random: " + i);
                     if (listaPMF[i] != null)
                     {
                         textPregunta.text = listaPMF[i].Pregunta;
@@ -118,11 +124,13 @@ public class GameController : MonoBehaviour
                 }
             }
             else 
-            {   
+            {
+                Debug.Log("Tipo de pregunta:" + tipo);
                 PanelPA.SetActive (true);
                 if (listaPAF.Count != 0) 
                 {
                     int i = UnityEngine.Random.Range(0, listaPAF.Count);
+                    Debug.Log("Indice random: " + i);
                     if (listaPAF[i] != null)
                     {
                         textPreguntaA.text = listaPAF[i].Pregunta;
@@ -132,7 +140,7 @@ public class GameController : MonoBehaviour
                 }
             }
 
-          
+            
         }
         else 
         {
