@@ -10,65 +10,88 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
+    #region declaracion de variables
     string lineaLeida = "";
     List<PreguntaMultiple> listaPreguntasMultiples;
     List<preguntaAbierta> listaPreguntasAbiertas;
+    List<preguntaFV> listaPreguntasFV;
+    List<preguntaFV> listaPFVF;
+    List<preguntaFV> listaPFVD;
     List<PreguntaMultiple> listaPMF;
     List<PreguntaMultiple> listaPMD;
     List<preguntaAbierta> listaPAF;
     List<preguntaAbierta> listaPAD;
     string respuestaPM;
     public bool dificiles = false;
-    bool PMvacio = false;
+    public bool PMvacio = false;
+    public bool PAvacio = false;
+    public bool PFVvacio = false;
+    public int RC = 0;
+    public int RI = 0;
+    List<int> tiposDisponibles = new List<int> { 1, 2, 3 };
 
     public TextMeshProUGUI textPregunta;
     public TextMeshProUGUI textPreguntaA;
+    public TextMeshProUGUI textPreguntaFV;
     public TextMeshProUGUI textResp1;
     public TextMeshProUGUI textResp2;
     public TextMeshProUGUI textResp3;
     public TextMeshProUGUI textResp4;
+    public TextMeshProUGUI textRC;
+    public TextMeshProUGUI textRI;
     public TMP_InputField inputR;
     public GameObject PanelRC;
     public GameObject PanelRI;
+    public GameObject PanelLvlup;
     public GameObject PanelDif;
     public GameObject PanelPA;
     public GameObject PanelPM;
+    public GameObject PanelPFV;
+    #endregion
 
     // Start is called before the first frame update
     void Start()
     {
-        UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
+        #region inicializacion
         PanelRC.SetActive(false);
         PanelRI.SetActive(false);
         PanelDif.SetActive(false);
         PanelPA.SetActive(false);
+        PanelPFV.SetActive(false);
+        PanelLvlup.SetActive(false);
         listaPMF = new List<PreguntaMultiple>();
         listaPMD = new List<PreguntaMultiple>();
         listaPAF = new List<preguntaAbierta>();
         listaPAD = new List<preguntaAbierta>();
+        listaPFVF = new List<preguntaFV>();
+        listaPFVD = new List<preguntaFV>();
         listaPreguntasAbiertas = new List<preguntaAbierta>();
         listaPreguntasMultiples = new List<PreguntaMultiple>();
+        listaPreguntasFV = new List<preguntaFV>();
         LecturaPreguntasMultiples();
         LecturaPreguntasAbiertas();
-        esFacil();
-        mostrarPreguntasMultiples();
+        LecturaPreguntasFV();
+        organizar();
+        mostrarPreguntas();
+        #endregion
     }
 
     // Update is called once per frame
     void Update()
     {
+       
 
     }
-
-    public void esFacil() 
-    { 
-        for(int i = 0; i < listaPreguntasMultiples.Count; i++)
+    #region organizarpreguntas
+    public void organizar()
+    {
+        for (int i = 0; i < listaPreguntasMultiples.Count; i++)
         {
             if (listaPreguntasMultiples[i].Dificultad == "facil")
             {
                 listaPMF.Add(listaPreguntasMultiples[i]);
             }
-            else 
+            else
             {
                 listaPMD.Add(listaPreguntasMultiples[i]);
             }
@@ -86,81 +109,155 @@ public class GameController : MonoBehaviour
                 listaPAD.Add(listaPreguntasAbiertas[i]);
             }
         }
-        Debug.Log("Lista faciles abiertas: " + listaPMF.Count + "Lista dificiles abiertas:" + listaPMD.Count);
+        Debug.Log("Lista faciles abiertas: " + listaPAF.Count + "Lista dificiles abiertas:" + listaPAD.Count);
+
+        for (int i = 0; i < listaPreguntasFV.Count; i++)
+        {
+            if (listaPreguntasFV[i].Dificultad == "facil")
+            {
+                listaPFVF.Add(listaPreguntasFV[i]);
+            }
+            else
+            {
+                listaPFVD.Add(listaPreguntasFV[i]);
+            }
+        }
+        Debug.Log("Lista faciles fv: " + listaPFVF.Count + "Lista dificiles fv:" + listaPFVD.Count);
     }
-    public void mostrarPreguntasMultiples()
+    #endregion
+
+    #region tipo de pregunta y pase a dificil
+    public void mostrarPreguntas()
     {
-        
-        int tipo = UnityEngine.Random.Range(1,2);
-
-        if (dificiles == false)
+        if (tiposDisponibles.Count == 0 && dificiles)
         {
-           
-            
-            if (tipo == 1 && PMvacio != true)
-            {
-                Debug.Log("Tipo de pregunta:"+ tipo);
+            PanelDif.SetActive(true);
+            return;
+        }
+        if (tiposDisponibles.Count == 0)
+        {
+            dificiles = true;
+            PanelLvlup.SetActive(true);
+            PMvacio = false;
+            PAvacio = false;
+            PFVvacio = false;
+            tiposDisponibles.Add(1);
+            tiposDisponibles.Add(2);
+            tiposDisponibles.Add(3);
+            mostrarPreguntas();
+            return;
+        }
+        Debug.Log("Mostrando pregunta...");
+        int tipo = tiposDisponibles[UnityEngine.Random.Range(0, tiposDisponibles.Count)];
+        Debug.Log("tipo: " + tipo);
+       
+        switch (tipo)
+        {
+            case 1:
                 PanelPA.SetActive(false);
-                if (listaPMF.Count != 8)
-                {
-                    int i = UnityEngine.Random.Range(0, listaPMF.Count);
-                    Debug.Log("Indice random: " + i);
-                    if (listaPMF[i] != null)
-                    {
-                        textPregunta.text = listaPMF[i].Pregunta;
-                        textResp1.text = listaPMF[i].Respuesta1;
-                        textResp2.text = listaPMF[i].Respuesta2;
-                        textResp3.text = listaPMF[i].Respuesta3;
-                        textResp4.text = listaPMF[i].Respuesta4;
-                        respuestaPM = listaPMF[i].RespuestaCorrecta;
-                        listaPMF.Remove(listaPMF[i]);
-                    }
-                }
-                else
-                {
-                    PMvacio = true; 
-                    PanelPM.SetActive(false);
-                    mostrarPreguntasMultiples();
-                }
-            }
-            else 
-            {
-                Debug.Log("Tipo de pregunta:" + tipo);
-                PanelPA.SetActive (true);
-                if (listaPAF.Count != 0) 
-                {
-                    int i = UnityEngine.Random.Range(0, listaPAF.Count);
-                    Debug.Log("Indice random: " + i);
-                    if (listaPAF[i] != null)
-                    {
-                        textPreguntaA.text = listaPAF[i].Pregunta;
-                        respuestaPM = listaPAF[i].Respuesta;
-                        listaPAF.Remove(listaPAF[i]);
-                    }
-                }
-            }
-
-            
+                PanelPFV.SetActive(false);
+                MostrarPreguntaMultiple(dificiles ? listaPMD : listaPMF, ref PMvacio, PanelPM);
+                break;
+            case 2:
+                PanelPM.SetActive(false);
+                PanelPFV.SetActive(false);
+                MostrarPreguntaAbierta(dificiles ? listaPAD : listaPAF, ref PAvacio, PanelPA);
+                break;
+            case 3:
+                PanelPA.SetActive(false);
+                PanelPM.SetActive(false);
+                MostrarPreguntaFV(dificiles ? listaPFVD : listaPFVF, ref PFVvacio, PanelPFV);
+                break;
         }
-        else 
-        {
-            if (listaPMD.Count != 0)
-            {
-                int i = UnityEngine.Random.Range(0, listaPMD.Count);
-                if (listaPMD[i] != null)
-                {
-                    textPregunta.text = listaPMD[i].Pregunta;
-                    textResp1.text = listaPMD[i].Respuesta1;
-                    textResp2.text = listaPMD[i].Respuesta2;
-                    textResp3.text = listaPMD[i].Respuesta3;
-                    textResp4.text = listaPMD[i].Respuesta4;
-                    respuestaPM = listaPMD[i].RespuestaCorrecta;
-                    listaPMF.Remove(listaPMD[i]);
-                }
-            }
-        }
-        
+       
+       
     }
+    #endregion
+
+    #region mostrarpreguntas
+    private void MostrarPreguntaMultiple(List<PreguntaMultiple> lista, ref bool vacioFlag, GameObject panel)
+    {
+        if (lista.Count == 0)
+        {
+            vacioFlag = true;
+            tiposDisponibles.Remove(1);
+            panel.SetActive(false);
+            Debug.Log("No hay más preguntas múltiples.");
+            mostrarPreguntas();
+            
+            return;
+        }
+
+        panel.SetActive(true);
+        int i = UnityEngine.Random.Range(0, lista.Count);
+
+        
+       
+
+        textPregunta.text = lista[i].Pregunta;
+        textResp1.text = lista[i].Respuesta1;
+        textResp2.text = lista[i].Respuesta2;
+        textResp3.text = lista[i].Respuesta3;
+        textResp4.text = lista[i].Respuesta4;
+        respuestaPM = lista[i].RespuestaCorrecta;
+
+        lista.RemoveAt(i);  // Eliminar la pregunta seleccionada
+        Debug.Log("PM actuales" +lista.Count);
+    }
+
+    private void MostrarPreguntaAbierta(List<preguntaAbierta> lista, ref bool vacioFlag, GameObject panel)
+    {
+        if (lista.Count == 0)
+        {
+            vacioFlag = true;
+            panel.SetActive(false);
+            tiposDisponibles.Remove(2);
+            Debug.Log("No hay más preguntas abiertas.");
+            mostrarPreguntas();
+            
+            return;
+        }
+
+        panel.SetActive(true);
+        int i = UnityEngine.Random.Range(0, lista.Count);
+
+        
+
+        textPreguntaA.text = lista[i].Pregunta;
+        respuestaPM = lista[i].Respuesta;
+
+        lista.RemoveAt(i);
+        Debug.Log("PA actuales" + lista.Count);
+    }
+
+    private void MostrarPreguntaFV(List<preguntaFV> lista, ref bool vacioFlag, GameObject panel)
+    {
+        if (lista.Count == 0)
+        {
+            vacioFlag = true;
+            panel.SetActive(false);
+            tiposDisponibles.Remove(3);
+            Debug.Log("No hay más preguntas falso verdadero.");
+            mostrarPreguntas();
+            
+            
+            return;
+        }
+
+        panel.SetActive(true);
+        int i = UnityEngine.Random.Range(0, lista.Count);
+
+
+
+        textPreguntaFV.text = lista[i].Pregunta;
+        respuestaPM = lista[i].Respuesta;
+
+        lista.RemoveAt(i);
+
+        Debug.Log("PFV actuales" + lista.Count);
+    }
+
+    #endregion
 
     #region comprobacion de respuesta
     public void comprobarRespuesta1()
@@ -169,11 +266,13 @@ public class GameController : MonoBehaviour
         {
            PanelRC.SetActive(true);
            PanelRI.SetActive(false);
+           RC += 1;
         }
         else
         {
             PanelRC.SetActive(false);
             PanelRI.SetActive(true);
+            RI += 1;
         }
     }
 
@@ -183,12 +282,13 @@ public class GameController : MonoBehaviour
         {
             PanelRC.SetActive(true);
             PanelRI.SetActive(false);
-
+            RC += 1;
         }
         else
         {
             PanelRC.SetActive(false);
             PanelRI.SetActive(true);
+            RI += 1;
         }
     }
     public void comprobarRespuesta3()
@@ -197,12 +297,13 @@ public class GameController : MonoBehaviour
         {
             PanelRC.SetActive(true);
             PanelRI.SetActive(false);
-
+            RC += 1;
         }
         else
         {
             PanelRC.SetActive(false);
             PanelRI.SetActive(true);
+            RI += 1;
         }
     }
     public void comprobarRespuesta4()
@@ -211,13 +312,31 @@ public class GameController : MonoBehaviour
         {
             PanelRC.SetActive(true);
             PanelRI.SetActive(false);
-
+            RC += 1;
         }
         else
         {
             PanelRC.SetActive(false);
             PanelRI.SetActive(true);
+            RI += 1;
         }
+    }
+
+    public void comprobarRespuestaFV(bool escogido) 
+    {
+        if (escogido == bool.Parse(respuestaPM))
+        {
+            PanelRC.SetActive(true);
+            PanelRI.SetActive(false);
+            RC += 1;
+        }
+        else 
+        {
+            PanelRC.SetActive(false);
+            PanelRI.SetActive(true);
+            RI += 1;
+        }
+
     }
 
     public void comprobarRespuestaAbierta()
@@ -263,7 +382,7 @@ public class GameController : MonoBehaviour
                 listaPreguntasMultiples.Add(objPM);
 
             }
-            Debug.Log("El tamaño de la lista es " + listaPreguntasMultiples.Count);
+            Debug.Log("PreguntasM: " + listaPreguntasMultiples.Count);
         }
         catch(Exception e) 
         { 
@@ -291,7 +410,7 @@ public class GameController : MonoBehaviour
                 listaPreguntasAbiertas.Add(objPA);
 
             }
-            Debug.Log("El tamaño de la lista es " + listaPreguntasAbiertas.Count);
+            Debug.Log("PreguntasA " + listaPreguntasAbiertas.Count);
         }
         catch (Exception e)
         {
@@ -300,6 +419,36 @@ public class GameController : MonoBehaviour
         finally
         { Debug.Log("Executing finally block."); }
     }
+
+    public void LecturaPreguntasFV()
+    {
+        try
+        {
+            StreamReader sr1 = new StreamReader("Assets/Files/preguntasFalso_Verdadero.txt");
+            while ((lineaLeida = sr1.ReadLine()) != null)
+            {
+                string[] lineaPartida = lineaLeida.Split("-");
+                string pregunta = lineaPartida[0];
+                string respuesta = lineaPartida[1];
+                string versiculo = lineaPartida[2];
+                string dificultad = lineaPartida[3];
+
+
+                preguntaFV objPA = new preguntaFV(pregunta, respuesta, versiculo, dificultad);
+
+                listaPreguntasFV.Add(objPA);
+
+            }
+            Debug.Log("PreguntasFV:  " + listaPreguntasFV.Count);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("ERROR!!!!! " + e.ToString());
+        }
+        finally
+        { Debug.Log("Executing finally block."); }
+    }
+
     #endregion
 
 
