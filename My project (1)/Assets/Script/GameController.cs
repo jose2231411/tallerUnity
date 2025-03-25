@@ -132,6 +132,8 @@ public class GameController : MonoBehaviour
         if (tiposDisponibles.Count == 0 && dificiles)
         {
             PanelDif.SetActive(true);
+            textRC.SetText(RC.ToString());
+            textRI.SetText(RI.ToString());
             return;
         }
         if (tiposDisponibles.Count == 0)
