@@ -7,6 +7,7 @@ using models;
 using TMPro;
 using UnityEngine.UIElements;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class GameController : MonoBehaviour
 {
@@ -45,14 +46,18 @@ public class GameController : MonoBehaviour
     public GameObject PanelLvlup;
     public GameObject PanelDif;
     public GameObject PanelPA;
-    public GameObject PanelPM;
+    public GameObject PanelPM;  
     public GameObject PanelPFV;
+    public TextMeshProUGUI hahaha;
+ 
+
     #endregion
 
     // Start is called before the first frame update
     void Start()
     {
         #region inicializacion
+        
         PanelRC.SetActive(false);
         PanelRI.SetActive(false);
         PanelDif.SetActive(false);
@@ -223,14 +228,18 @@ public class GameController : MonoBehaviour
         panel.SetActive(true);
         int i = UnityEngine.Random.Range(0, lista.Count);
 
-        
 
+
+        
         textPreguntaA.text = lista[i].Pregunta;
+        hahaha.text = lista[i].Respuesta;
         respuestaPM = lista[i].Respuesta;
 
         lista.RemoveAt(i);
         Debug.Log("PA actuales" + lista.Count);
     }
+   
+
 
     private void MostrarPreguntaFV(List<preguntaFV> lista, ref bool vacioFlag, GameObject panel)
     {
@@ -354,8 +363,8 @@ public class GameController : MonoBehaviour
         }
         else 
         {
-            PanelRC.SetActive(false);
-            PanelRI.SetActive(true);
+            PanelRC.SetActive(true);
+            //PanelRI.SetActive(true);
         }
     }
     #endregion
