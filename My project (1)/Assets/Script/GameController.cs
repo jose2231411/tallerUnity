@@ -8,7 +8,15 @@ using TMPro;
 using UnityEngine.UIElements;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+//INTEGRANTES 
 
+//JoseAndresCriolloEcheverri
+
+//JuanCamiloSalgadoBaldion
+
+//JuanDavidUrrea
+
+//JuanDiegoPatiñoParra
 public class GameController : MonoBehaviour
 {
     #region declaracion de variables
